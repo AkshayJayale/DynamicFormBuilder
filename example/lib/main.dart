@@ -1,7 +1,7 @@
-import 'package:dynamic_form_builder/dynamic_form_builder.dart';
+import 'package:dynamic_ui_builder/dynamic_ui_builder.dart';
 import 'package:flutter/material.dart';
-import 'package:dynamic_form_builder/src/widgets/field_factory.dart';
-import 'package:dynamic_form_builder/src/models/form_field_config.dart';
+import 'package:dynamic_ui_builder/src/widgets/field_factory.dart';
+import 'package:dynamic_ui_builder/src/models/form_field_config.dart';
 
 void main() => runApp(const MyApp());
 

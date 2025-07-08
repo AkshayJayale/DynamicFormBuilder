@@ -15,14 +15,14 @@ A Flutter package to dynamically generate multi-step forms using JSON configurat
 ### 1. Add dependency
 ```yaml
 dependencies:
-  dynamic_form_builder:
+  dynamic_ui_builder:
     git:
-      url: https://github.com/your_username/dynamic_form_builder.git
+      url: https://github.com/AkshayJayale/DynamicFormBuilder.git
 ```
 
 ### 2. Import the package
 ```dart
-import 'package:dynamic_form_builder/dynamic_form_builder.dart';
+import 'package:dynamic_ui_builder/dynamic_ui_builder.dart';
 ```
 
 ### 3. Define your JSON config (for full form)

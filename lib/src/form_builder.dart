@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dynamic_form_builder/src/widgets/field_factory.dart';
+import 'package:dynamic_ui_builder/src/widgets/field_factory.dart';
 import 'models/form_field_config.dart';
 
 class DynamicFormBuilder extends StatefulWidget {
