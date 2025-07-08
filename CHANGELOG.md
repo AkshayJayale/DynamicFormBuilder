@@ -1,0 +1,22 @@
+## [NEXT RELEASE] - YYYY-MM-DD
+### Added
+- Field-level `required` flag for all field types (text, dropdown, radio, checkbox, switch, slider, date, time, signature, rating).
+- Support for `minLength`, `maxLength`, `minLines`, `maxLines`, and `regex` validation for text fields.
+- Support for `minDate` and `maxDate` for date fields.
+- Signature capture widget (browser and mobile compatible).
+- Example for single field validation using `FieldFactory`.
+- Improved validation logic: minLength and regex only validated if required or not empty.
+- All field types now support required/optional logic from JSON config.
+
+### Changed
+- Refactored validators to respect the `required` flag and skip validation if not required and empty.
+- Example app now includes both a dynamic form and a single field validation tab.
+
+### Fixed
+- Regex and length validation bugs for optional fields.
+
+---
+
+## 0.0.1
+
+* TODO: Describe initial release.
