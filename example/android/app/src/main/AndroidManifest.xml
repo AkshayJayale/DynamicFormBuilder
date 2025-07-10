@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.support_libs.dynamicFromBuilder_example">
+    package="com.support_libs.dynamicUiBuilder_example">
    <application
-        android:label="dynamicFromBuilder_example"
+        android:label="dynamicUiBuilder_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

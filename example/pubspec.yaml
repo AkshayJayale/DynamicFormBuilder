@@ -1,6 +1,6 @@
-name: dynamic_form_builder_example
+name: dynamic_ui_builder_example
 
-description: "Demonstrates how to use the dynamic_form_builder plugin."
+description: "Demonstrates how to use the dynamic_ui_builder plugin."
 publish_to: 'none'
 
 environment:
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  dynamic_form_builder:
+  dynamic_ui_builder:
     path: ../
   cupertino_icons: ^1.0.8
 
