@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:dynamic_ui_builder/src/widgets/field_factory.dart';
 import 'models/form_field_config.dart';
 
-class DynamicFormBuilder extends StatefulWidget {
+class DynamicUiBuilder extends StatefulWidget {
   final List<Map<String, dynamic>> jsonConfig;
   final void Function(Map<String, dynamic> result)? onSubmit;
 
-  const DynamicFormBuilder(
+  const DynamicUiBuilder(
       {super.key, required this.jsonConfig, this.onSubmit});
 
   @override
-  State<DynamicFormBuilder> createState() => _DynamicFormBuilderState();
+  State<DynamicUiBuilder> createState() => _DynamicUiBuilderState();
 }
 
-class _DynamicFormBuilderState extends State<DynamicFormBuilder> {
+class _DynamicUiBuilderState extends State<DynamicUiBuilder> {
   final Map<String, dynamic> formData = {};
   final List<GlobalKey<FormState>> _formKeys = [];
   late final List<List<FormFieldConfig>> steps;

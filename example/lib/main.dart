@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
         length: 2,
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Dynamic Form Example'),
+            title: const Text('Dynamic UI Example'),
             bottom: const TabBar(
               tabs: [
                 Tab(text: 'Dynamic Form'),
@@ -41,7 +41,7 @@ class DynamicFormTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Builder(
-      builder: (innerContext) => DynamicFormBuilder(
+      builder: (innerContext) => DynamicUiBuilder(
         jsonConfig: formJson,
         onSubmit: (result) {
           showDialog(

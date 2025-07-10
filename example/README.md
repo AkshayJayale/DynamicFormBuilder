@@ -1,16 +1,16 @@
-# validation_engine_example
+# dynamic_ui_builder Example
 
-Demonstrates how to use the validation_engine plugin.
+This example demonstrates how to use the `dynamic_ui_builder` package to build dynamic forms and UIs in Flutter.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Ensure you have Flutter installed. For setup instructions, see the [Flutter documentation](https://docs.flutter.dev/get-started/install).
+2. In this directory, run:
+   ```sh
+   flutter pub get
+   flutter run
+   ```
 
-A few resources to get you started if this is your first Flutter project:
+This will launch the example app showcasing dynamic UI building capabilities.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For more details, see the main package [README](../README.md).
