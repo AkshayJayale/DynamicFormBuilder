@@ -1,4 +1,8 @@
 ## [NEXT RELEASE] - YYYY-MM-DD
+
+---
+
+## 0.0.2 - 2025-07-11
 ### Added
 - Field-level `required` flag for all field types (text, dropdown, radio, checkbox, switch, slider, date, time, signature, rating).
 - Support for `minLength`, `maxLength`, `minLines`, `maxLines`, and `regex` validation for text fields.
