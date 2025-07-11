@@ -425,14 +425,12 @@ class _ImagePickerField extends StatefulWidget {
 }
 
 class _ImagePickerFieldState extends State<_ImagePickerField> {
-  File? _imageFile;
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        _imageFile = File(pickedFile.path);
         widget.formData[widget.fieldKey] = pickedFile.path;
         widget.onChanged?.call();
       });
