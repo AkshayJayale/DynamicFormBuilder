@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import '../models/form_field_config.dart';
 import 'package:signature/signature.dart';
 import 'dart:developer';
+import 'package:image_picker/image_picker.dart'; // Add image_picker to pubspec.yaml
+import 'package:file_picker/file_picker.dart'; // Add file_picker to pubspec.yaml
+import 'package:flutter_pdfview/flutter_pdfview.dart'; // Add flutter_pdfview to pubspec.yaml
+import 'dart:io';
+import 'package:path_provider/path_provider.dart'; // Ensure this is available
+import 'package:http/http.dart' as http;
 
 class FieldFactory {
   static Widget build(
@@ -240,6 +246,30 @@ class FieldFactory {
           ],
         );
 
+      case 'image_picker':
+        return _ImagePickerField(
+          label: field.label,
+          formData: formData,
+          fieldKey: field.key,
+          onChanged: onChanged,
+        );
+
+      case 'file_picker':
+        return _FilePickerField(
+          label: field.label,
+          formData: formData,
+          fieldKey: field.key,
+          onChanged: onChanged,
+        );
+
+      case 'pdf_view':
+        return _PDFViewField(
+          label: field.label,
+          formData: formData,
+          fieldKey: field.key,
+          onChanged: onChanged,
+        );
+
       default:
         return const SizedBox();
     }
@@ -294,6 +324,7 @@ class _SignatureFieldState extends State<_SignatureField> {
     onDrawStart: () => log('onDrawStart called!'),
     onDrawEnd: () => log('onDrawEnd called!'),
   );
+
   @override
   void initState() {
     super.initState();
@@ -370,6 +401,277 @@ class _SignatureFieldState extends State<_SignatureField> {
             ]
           ],
         ),
+      ],
+    );
+  }
+}
+
+class _ImagePickerField extends StatefulWidget {
+  final String label;
+  final Map<String, dynamic> formData;
+  final String fieldKey;
+  final VoidCallback? onChanged;
+
+  const _ImagePickerField({
+    required this.label,
+    required this.formData,
+    required this.fieldKey,
+    this.onChanged,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_ImagePickerField> createState() => _ImagePickerFieldState();
+}
+
+class _ImagePickerFieldState extends State<_ImagePickerField> {
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+        widget.formData[widget.fieldKey] = pickedFile.path;
+        widget.onChanged?.call();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final imagePath = widget.formData[widget.fieldKey];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(widget.label),
+        const SizedBox(height: 8),
+        if (imagePath != null) Image.file(File(imagePath), height: 120),
+        ElevatedButton(
+          onPressed: _pickImage,
+          child: const Text('Pick Image'),
+        ),
+      ],
+    );
+  }
+}
+
+class _FilePickerField extends StatefulWidget {
+  final String label;
+  final Map<String, dynamic> formData;
+  final String fieldKey;
+  final VoidCallback? onChanged;
+
+  const _FilePickerField({
+    required this.label,
+    required this.formData,
+    required this.fieldKey,
+    this.onChanged,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_FilePickerField> createState() => _FilePickerFieldState();
+}
+
+class _FilePickerFieldState extends State<_FilePickerField> {
+  String? _fileName;
+
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _fileName = result.files.single.name;
+        widget.formData[widget.fieldKey] = result.files.single.path;
+        widget.onChanged?.call();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filePath = widget.formData[widget.fieldKey];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        Text(widget.label),
+        const SizedBox(height: 8),
+        if (filePath != null)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Text(
+              'Selected: ${_fileName ?? filePath.split('/').last}',
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ElevatedButton(
+          onPressed: _pickFile,
+          child: const Text('Pick File'),
+        ),
+      ],
+    );
+  }
+}
+
+class _PDFViewField extends StatefulWidget {
+  final String label;
+  final Map<String, dynamic> formData;
+  final String fieldKey;
+  final VoidCallback? onChanged;
+
+  const _PDFViewField({
+    required this.label,
+    required this.formData,
+    required this.fieldKey,
+    this.onChanged,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_PDFViewField> createState() => _PDFViewFieldState();
+}
+
+class _PDFViewFieldState extends State<_PDFViewField> {
+  String? _fileName;
+  var filePath;
+  bool _isLoading = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _initPdfSource();
+  }
+
+  Future<void> _initPdfSource() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    final url = widget.formData[widget.fieldKey + '_url'];
+    final asset = widget.formData[widget.fieldKey + '_asset'];
+    if (url != null && url is String && url.isNotEmpty) {
+      try {
+        filePath = await _downloadPdf(url);
+        _fileName = url.split('/').last;
+      } catch (e) {
+        _error = 'Failed to load PDF from URL.';
+      }
+    } else if (asset != null && asset is String && asset.isNotEmpty) {
+      filePath = asset;
+      _fileName = asset.split('/').last;
+    } else {
+      filePath = widget.formData[widget.fieldKey];
+      if (filePath != null) {
+        _fileName = filePath.split('/').last;
+      }
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  Future<String> _downloadPdf(String url) async {
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      // Use getTemporaryDirectory from path_provider
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/${url.split('/').last}');
+      await file.writeAsBytes(response.bodyBytes);
+      return file.path;
+    } else {
+      throw Exception('Failed to download PDF');
+    }
+  }
+
+  Future<void> _pickPdfFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        filePath = result.files.single.path;
+        _fileName = result.files.single.name;
+        widget.formData[widget.fieldKey] = result.files.single.path;
+        widget.onChanged?.call();
+      });
+    }
+  }
+
+  void _clearPdfFile() {
+    setState(() {
+      filePath = null;
+      _fileName = null;
+      widget.formData[widget.fieldKey] = null;
+      widget.formData[widget.fieldKey + '_url'] = null;
+      widget.formData[widget.fieldKey + '_asset'] = null;
+      widget.onChanged?.call();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Always re-check source in build in case formData changes
+    final url = widget.formData[widget.fieldKey + '_url'];
+    final asset = widget.formData[widget.fieldKey + '_asset'];
+    if ((url != null && url is String && url.isNotEmpty) ||
+        (asset != null && asset is String && asset.isNotEmpty)) {
+      // If URL or asset, ensure filePath is set
+      if (filePath == null) {
+        _initPdfSource();
+      }
+    } else {
+      filePath = widget.formData[widget.fieldKey];
+      if (filePath != null) {
+        _fileName = filePath.split('/').last;
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Text(widget.label),
+            const SizedBox(width: 10),
+            if (filePath == null && !_isLoading && widget.fieldKey == "pdf_file")
+              ElevatedButton(
+                onPressed: _pickPdfFile,
+                child: const Text('Pick File'),
+              ),
+            if (filePath != null)
+              ElevatedButton(
+                onPressed: _clearPdfFile,
+                child: const Text('Clear PDF'),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        if (_isLoading) const CircularProgressIndicator(),
+        if (_error != null)
+          Text(_error!, style: const TextStyle(color: Colors.red)),
+        if (filePath != null && _fileName != null && !_isLoading)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Text(
+              'Selected: \\${_fileName}',
+              softWrap: false,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        const SizedBox(height: 8),
+        if (filePath != null &&
+            filePath.toString().endsWith('.pdf') &&
+            !_isLoading)
+          SizedBox(
+            height: 500,
+            child: PDFView(
+              filePath: filePath,
+            ),
+          )
+        else if (!_isLoading && filePath == null)
+          const Text('No PDF selected.'),
       ],
     );
   }

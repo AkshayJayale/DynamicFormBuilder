@@ -6,8 +6,7 @@ class DynamicUiBuilder extends StatefulWidget {
   final List<Map<String, dynamic>> jsonConfig;
   final void Function(Map<String, dynamic> result)? onSubmit;
 
-  const DynamicUiBuilder(
-      {super.key, required this.jsonConfig, this.onSubmit});
+  const DynamicUiBuilder({super.key, required this.jsonConfig, this.onSubmit});
 
   @override
   State<DynamicUiBuilder> createState() => _DynamicUiBuilderState();
@@ -79,22 +78,24 @@ class _DynamicUiBuilderState extends State<DynamicUiBuilder> {
                 padding: const EdgeInsets.all(16.0),
                 child: Form(
                   key: _formKeys[i],
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        steps[i].isNotEmpty &&
-                                steps[i][0].title != null &&
-                                steps[i][0].title!.isNotEmpty
-                            ? steps[i][0].title!
-                            : 'Step ${i + 1}',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const SizedBox(height: 16),
-                      for (var field in steps[i])
-                        FieldFactory.build(field, formData, context,
-                            onChanged: () => setState(() {})),
-                    ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          steps[i].isNotEmpty &&
+                                  steps[i][0].title != null &&
+                                  steps[i][0].title!.isNotEmpty
+                              ? steps[i][0].title!
+                              : 'Step  i + 1',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 16),
+                        for (var field in steps[i])
+                          FieldFactory.build(field, formData, context,
+                              onChanged: () => setState(() {})),
+                      ],
+                    ),
                   ),
                 ),
               );

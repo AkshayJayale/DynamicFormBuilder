@@ -69,18 +69,17 @@ class _SingleFieldFormState extends State<SingleFieldForm> {
   String? _fullName;
   final Map<String, dynamic> _formData = {};
   var fullNameField = {
-  "type": "text",
-  "label": "Full Name",
-  "key": "name",
-  "hint": "Enter your full name",
-  "regex": "^[a-zA-Z ]+\$",
-  "error": "Only alphabets allowed",
-  "step": 0,
-  "title": "Personal Information",
-  "required": false
+    "type": "text",
+    "label": "Full Name",
+    "key": "name",
+    "hint": "Enter your full name",
+    "regex": "^[a-zA-Z ]+\$",
+    "error": "Only alphabets allowed",
+    "step": 0,
+    "title": "Personal Information",
+    "required": false
   };
-  late final FormFieldConfig _config =
-      FormFieldConfig.fromJson(fullNameField);
+  late final FormFieldConfig _config = FormFieldConfig.fromJson(fullNameField);
 
   @override
   Widget build(BuildContext context) {
@@ -227,5 +226,47 @@ final formJson = [
     "step": 3,
     "title": "Personal Information",
     "required": true
+  },
+  {
+    "type": "image_picker",
+    "label": "Profile Image",
+    "key": "profile_image",
+    "step": 4,
+    "title": "Attachments",
+    "required": false
+  },
+  {
+    "type": "file_picker",
+    "label": "Resume (PDF, DOC, etc.)",
+    "key": "resume_file",
+    "step": 4,
+    "title": "Attachments",
+    "required": false
+  },
+  {
+    "type": "pdf_view",
+    "label": "View PDF",
+    "key": "pdf_file",
+    "step": 4,
+    "title": "Attachments",
+    "required": false
+  },
+  {
+    "type": "pdf_view",
+    "label": "View PDF Using Url",
+    "key": "pdf_file_url",
+    "step": 4,
+    "title": "Attachments",
+    "pdf_file_url": "https://example.com/yourfile.pdf",
+    "required": false
+  },
+  {
+    "type": "pdf_view",
+    "label": "View PDF Using Assets",
+    "key": "pdf_file_asset",
+    "step": 4,
+    "title": "Attachments",
+    'pdf_file_asset': 'assets/yourfile.pdf',
+    "required": false
   }
 ];
