@@ -92,7 +92,6 @@ class _SingleFieldFormState extends State<SingleFieldForm> {
           children: [
             FieldFactory.build(
               _config,
-              _formData,
               context,
             ),
             const SizedBox(height: 24),
@@ -120,6 +119,16 @@ class _SingleFieldFormState extends State<SingleFieldForm> {
 }
 
 final formJson = [
+  {
+    "type": "filter",
+    "label": "Category",
+    "key": "category",
+    "filterType": "independent",
+    "options": ["Electronics", "Clothing", "Books"],
+    "validation": {"required": true},
+    "step": 0,
+    "title": "Filters"
+  },
   {
     "type": "text",
     "label": "Full Name",
@@ -155,6 +164,21 @@ final formJson = [
     "step": 0,
     "title": "Personal Information",
     "required": true
+  },
+  {
+    "type": "filter",
+    "label": "Subcategory",
+    "key": "subcategory",
+    "filterType": "dependent",
+    "dependsOn": "category",
+    "optionsMap": {
+      "Electronics": ["Mobiles", "Laptops"],
+      "Clothing": ["Shirts", "Pants"],
+      "Books": ["Fiction", "Non-fiction"]
+    },
+    "validation": {"required": true},
+    "step": 1,
+    "title": "Filters"
   },
   {
     "type": "radio",
