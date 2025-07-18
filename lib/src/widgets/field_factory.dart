@@ -8,17 +8,18 @@ import 'package:flutter_pdfview/flutter_pdfview.dart'; // Add flutter_pdfview to
 import 'dart:io';
 import 'package:path_provider/path_provider.dart'; // Ensure this is available
 import 'package:http/http.dart' as http;
+import '../models/form_data_store.dart';
 
 class FieldFactory {
   static Widget build(
     FormFieldConfig field,
-    Map<String, dynamic> formData,
     BuildContext context, {
     void Function()? onChanged,
   }) {
     switch (field.type) {
       case 'text':
         return TextFormField(
+          controller: TextEditingController(text: FormDataStore.instance.data[field.key]),
           decoration:
               InputDecoration(labelText: field.label, hintText: field.hint),
           keyboardType: _getKeyboardType(field.inputType),
@@ -43,37 +44,37 @@ class FieldFactory {
             }
             return null;
           },
-          onSaved: (val) => formData[field.key] = val,
+          onSaved: (val) => FormDataStore.instance.data[field.key] = val,
         );
 
       case 'dropdown':
         return DropdownButtonFormField(
           decoration: InputDecoration(labelText: field.label),
-          value: formData[field.key],
+          value: FormDataStore.instance.data[field.key],
           items: field.options
               ?.map(
                   (e) => DropdownMenuItem(value: e, child: Text(e.toString())))
               .toList(),
-          onChanged: (val) => formData[field.key] = val,
+          onChanged: (val) => FormDataStore.instance.data[field.key] = val,
           validator: (val) =>
               (field.required ?? false) && val == null ? 'Required' : null,
         );
 
       case 'radio':
         return FormField(
-          validator: (val) =>
-              (field.required ?? false) && formData[field.key] == null
-                  ? 'Required'
-                  : null,
+          validator: (val) => (field.required ?? false) &&
+                  FormDataStore.instance.data[field.key] == null
+              ? 'Required'
+              : null,
           builder: (state) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               ...field.options!.map((opt) => RadioListTile(
                     title: Text(opt.toString()),
                     value: opt,
-                    groupValue: formData[field.key],
+                    groupValue: FormDataStore.instance.data[field.key],
                     onChanged: (val) {
-                      formData[field.key] = val;
+                      FormDataStore.instance.data[field.key] = val;
                       onChanged?.call();
                       state.didChange(val);
                     },
@@ -90,18 +91,18 @@ class FieldFactory {
 
       case 'checkbox':
         return FormField(
-          validator: (val) =>
-              (field.required ?? false) && !(formData[field.key] ?? false)
-                  ? 'Required'
-                  : null,
+          validator: (val) => (field.required ?? false) &&
+                  !(FormDataStore.instance.data[field.key] ?? false)
+              ? 'Required'
+              : null,
           builder: (state) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CheckboxListTile(
                 title: Text(field.label),
-                value: formData[field.key] ?? false,
+                value: FormDataStore.instance.data[field.key] ?? false,
                 onChanged: (val) {
-                  formData[field.key] = val;
+                  FormDataStore.instance.data[field.key] = val;
                   onChanged?.call();
                   state.didChange(val);
                 },
@@ -118,18 +119,18 @@ class FieldFactory {
 
       case 'switch':
         return FormField(
-          validator: (val) =>
-              (field.required ?? false) && !(formData[field.key] ?? false)
-                  ? 'Required'
-                  : null,
+          validator: (val) => (field.required ?? false) &&
+                  !(FormDataStore.instance.data[field.key] ?? false)
+              ? 'Required'
+              : null,
           builder: (state) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SwitchListTile(
                 title: Text(field.label),
-                value: formData[field.key] ?? false,
+                value: FormDataStore.instance.data[field.key] ?? false,
                 onChanged: (val) {
-                  formData[field.key] = val;
+                  FormDataStore.instance.data[field.key] = val;
                   onChanged?.call();
                   state.didChange(val);
                 },
@@ -146,23 +147,27 @@ class FieldFactory {
 
       case 'slider':
         return FormField<double>(
-          validator: (val) =>
-              (field.required ?? false) && (formData[field.key] == null)
-                  ? 'Required'
-                  : null,
-          initialValue: (formData[field.key] ?? field.min ?? 0.0).toDouble(),
+          validator: (val) => (field.required ?? false) &&
+                  (FormDataStore.instance.data[field.key] == null)
+              ? 'Required'
+              : null,
+          initialValue:
+              (FormDataStore.instance.data[field.key] ?? field.min ?? 0.0)
+                  .toDouble(),
           builder: (state) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(field.label),
               Slider(
-                value: (formData[field.key] ?? field.min ?? 0.0).toDouble(),
+                value:
+                    (FormDataStore.instance.data[field.key] ?? field.min ?? 0.0)
+                        .toDouble(),
                 min: field.min ?? 0.0,
                 max: field.max ?? 100.0,
                 divisions: field.divisions,
-                label: '${formData[field.key] ?? 0}',
+                label: '${FormDataStore.instance.data[field.key] ?? 0}',
                 onChanged: (val) {
-                  formData[field.key] = val;
+                  FormDataStore.instance.data[field.key] = val;
                   onChanged?.call();
                   state.didChange(val);
                 },
@@ -184,7 +189,8 @@ class FieldFactory {
         DateTime? maxDate =
             field.maxDate != null ? DateTime.tryParse(field.maxDate!) : null;
         return TextFormField(
-          controller: TextEditingController(text: formData[field.key] ?? ''),
+          controller: TextEditingController(
+              text: FormDataStore.instance.data[field.key] ?? ''),
           readOnly: true,
           onTap: () async {
             var picked = field.type == 'date'
@@ -199,7 +205,7 @@ class FieldFactory {
                     initialTime: TimeOfDay.now(),
                   );
             if (picked != null) {
-              formData[field.key] = field.type == 'date'
+              FormDataStore.instance.data[field.key] = field.type == 'date'
                   ? (picked as DateTime).toIso8601String().split('T')[0]
                   : (picked as TimeOfDay).format(context);
               onChanged?.call();
@@ -216,13 +222,12 @@ class FieldFactory {
       case 'signature':
         return _SignatureField(
           label: field.label,
-          formData: formData,
           fieldKey: field.key,
           onChanged: onChanged,
         );
 
       case 'rating':
-        final int rating = formData[field.key] ?? 0;
+        final int rating = FormDataStore.instance.data[field.key] ?? 0;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -237,7 +242,7 @@ class FieldFactory {
                     color: rating >= starIndex ? Colors.amber : Colors.grey,
                   ),
                   onPressed: () {
-                    formData[field.key] = starIndex;
+                    FormDataStore.instance.data[field.key] = starIndex;
                     onChanged?.call();
                   },
                 );
@@ -249,7 +254,6 @@ class FieldFactory {
       case 'image_picker':
         return _ImagePickerField(
           label: field.label,
-          formData: formData,
           fieldKey: field.key,
           onChanged: onChanged,
         );
@@ -257,7 +261,6 @@ class FieldFactory {
       case 'file_picker':
         return _FilePickerField(
           label: field.label,
-          formData: formData,
           fieldKey: field.key,
           onChanged: onChanged,
         );
@@ -265,8 +268,13 @@ class FieldFactory {
       case 'pdf_view':
         return _PDFViewField(
           label: field.label,
-          formData: formData,
           fieldKey: field.key,
+          onChanged: onChanged,
+        );
+
+      case 'filter':
+        return _FilterChipField(
+          field: field,
           onChanged: onChanged,
         );
 
@@ -297,13 +305,11 @@ class FieldFactory {
 
 class _SignatureField extends StatefulWidget {
   final String label;
-  final Map<String, dynamic> formData;
   final String fieldKey;
   final VoidCallback? onChanged;
 
   const _SignatureField({
     required this.label,
-    required this.formData,
     required this.fieldKey,
     this.onChanged,
     Key? key,
@@ -347,7 +353,7 @@ class _SignatureFieldState extends State<_SignatureField> {
     if (_controller.isNotEmpty) {
       final image = await _controller.toPngBytes();
       if (image != null) {
-        widget.formData[widget.fieldKey] = image;
+        FormDataStore.instance.data[widget.fieldKey] = image;
         widget.onChanged?.call();
         setState(() {});
       }
@@ -356,14 +362,14 @@ class _SignatureFieldState extends State<_SignatureField> {
 
   void _clearSignature() {
     _controller.clear();
-    widget.formData[widget.fieldKey] = null;
+    FormDataStore.instance.data[widget.fieldKey] = null;
     widget.onChanged?.call();
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    final hasSignature = widget.formData[widget.fieldKey] != null;
+    final hasSignature = FormDataStore.instance.data[widget.fieldKey] != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -408,13 +414,11 @@ class _SignatureFieldState extends State<_SignatureField> {
 
 class _ImagePickerField extends StatefulWidget {
   final String label;
-  final Map<String, dynamic> formData;
   final String fieldKey;
   final VoidCallback? onChanged;
 
   const _ImagePickerField({
     required this.label,
-    required this.formData,
     required this.fieldKey,
     this.onChanged,
     Key? key,
@@ -431,7 +435,7 @@ class _ImagePickerFieldState extends State<_ImagePickerField> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       setState(() {
-        widget.formData[widget.fieldKey] = pickedFile.path;
+        FormDataStore.instance.data[widget.fieldKey] = pickedFile.path;
         widget.onChanged?.call();
       });
     }
@@ -439,7 +443,7 @@ class _ImagePickerFieldState extends State<_ImagePickerField> {
 
   @override
   Widget build(BuildContext context) {
-    final imagePath = widget.formData[widget.fieldKey];
+    final imagePath = FormDataStore.instance.data[widget.fieldKey];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -457,13 +461,11 @@ class _ImagePickerFieldState extends State<_ImagePickerField> {
 
 class _FilePickerField extends StatefulWidget {
   final String label;
-  final Map<String, dynamic> formData;
   final String fieldKey;
   final VoidCallback? onChanged;
 
   const _FilePickerField({
     required this.label,
-    required this.formData,
     required this.fieldKey,
     this.onChanged,
     Key? key,
@@ -481,7 +483,7 @@ class _FilePickerFieldState extends State<_FilePickerField> {
     if (result != null && result.files.single.path != null) {
       setState(() {
         _fileName = result.files.single.name;
-        widget.formData[widget.fieldKey] = result.files.single.path;
+        FormDataStore.instance.data[widget.fieldKey] = result.files.single.path;
         widget.onChanged?.call();
       });
     }
@@ -489,7 +491,7 @@ class _FilePickerFieldState extends State<_FilePickerField> {
 
   @override
   Widget build(BuildContext context) {
-    final filePath = widget.formData[widget.fieldKey];
+    final filePath = FormDataStore.instance.data[widget.fieldKey];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -516,13 +518,11 @@ class _FilePickerFieldState extends State<_FilePickerField> {
 
 class _PDFViewField extends StatefulWidget {
   final String label;
-  final Map<String, dynamic> formData;
   final String fieldKey;
   final VoidCallback? onChanged;
 
   const _PDFViewField({
     required this.label,
-    required this.formData,
     required this.fieldKey,
     this.onChanged,
     Key? key,
@@ -549,8 +549,8 @@ class _PDFViewFieldState extends State<_PDFViewField> {
       _isLoading = true;
       _error = null;
     });
-    final url = widget.formData[widget.fieldKey + '_url'];
-    final asset = widget.formData[widget.fieldKey + '_asset'];
+    final url = FormDataStore.instance.data[widget.fieldKey + '_url'];
+    final asset = FormDataStore.instance.data[widget.fieldKey + '_asset'];
     if (url != null && url is String && url.isNotEmpty) {
       try {
         filePath = await _downloadPdf(url);
@@ -562,7 +562,7 @@ class _PDFViewFieldState extends State<_PDFViewField> {
       filePath = asset;
       _fileName = asset.split('/').last;
     } else {
-      filePath = widget.formData[widget.fieldKey];
+      filePath = FormDataStore.instance.data[widget.fieldKey];
       if (filePath != null) {
         _fileName = filePath.split('/').last;
       }
@@ -591,7 +591,7 @@ class _PDFViewFieldState extends State<_PDFViewField> {
       setState(() {
         filePath = result.files.single.path;
         _fileName = result.files.single.name;
-        widget.formData[widget.fieldKey] = result.files.single.path;
+        FormDataStore.instance.data[widget.fieldKey] = result.files.single.path;
         widget.onChanged?.call();
       });
     }
@@ -601,9 +601,9 @@ class _PDFViewFieldState extends State<_PDFViewField> {
     setState(() {
       filePath = null;
       _fileName = null;
-      widget.formData[widget.fieldKey] = null;
-      widget.formData[widget.fieldKey + '_url'] = null;
-      widget.formData[widget.fieldKey + '_asset'] = null;
+      FormDataStore.instance.data[widget.fieldKey] = null;
+      FormDataStore.instance.data[widget.fieldKey + '_url'] = null;
+      FormDataStore.instance.data[widget.fieldKey + '_asset'] = null;
       widget.onChanged?.call();
     });
   }
@@ -611,8 +611,8 @@ class _PDFViewFieldState extends State<_PDFViewField> {
   @override
   Widget build(BuildContext context) {
     // Always re-check source in build in case formData changes
-    final url = widget.formData[widget.fieldKey + '_url'];
-    final asset = widget.formData[widget.fieldKey + '_asset'];
+    final url = FormDataStore.instance.data[widget.fieldKey + '_url'];
+    final asset = FormDataStore.instance.data[widget.fieldKey + '_asset'];
     if ((url != null && url is String && url.isNotEmpty) ||
         (asset != null && asset is String && asset.isNotEmpty)) {
       // If URL or asset, ensure filePath is set
@@ -620,7 +620,7 @@ class _PDFViewFieldState extends State<_PDFViewField> {
         _initPdfSource();
       }
     } else {
-      filePath = widget.formData[widget.fieldKey];
+      filePath = FormDataStore.instance.data[widget.fieldKey];
       if (filePath != null) {
         _fileName = filePath.split('/').last;
       }
@@ -633,7 +633,9 @@ class _PDFViewFieldState extends State<_PDFViewField> {
           children: [
             Text(widget.label),
             const SizedBox(width: 10),
-            if (filePath == null && !_isLoading && widget.fieldKey == "pdf_file")
+            if (filePath == null &&
+                !_isLoading &&
+                widget.fieldKey == "pdf_file")
               ElevatedButton(
                 onPressed: _pickPdfFile,
                 child: const Text('Pick File'),
@@ -671,6 +673,119 @@ class _PDFViewFieldState extends State<_PDFViewField> {
         else if (!_isLoading && filePath == null)
           const Text('No PDF selected.'),
       ],
+    );
+  }
+}
+
+class _FilterChipField extends StatefulWidget {
+  final FormFieldConfig field;
+  final VoidCallback? onChanged;
+
+  const _FilterChipField({
+    required this.field,
+    this.onChanged,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<_FilterChipField> createState() => _FilterChipFieldState();
+}
+
+class _FilterChipFieldState extends State<_FilterChipField> {
+  List<dynamic> get _selected =>
+      (FormDataStore.instance.data[widget.field.key] as List<dynamic>?) ?? [];
+
+  List<dynamic> get _options {
+    if (widget.field.filterType == 'dependent' &&
+        widget.field.dependsOn != null) {
+      final parentValue = FormDataStore.instance.data[widget.field.dependsOn];
+      if (parentValue != null && widget.field.optionsMap != null) {
+        if (parentValue is List) {
+          // If parent is multi-select, combine all options
+          return parentValue
+              .expand((v) => widget.field.optionsMap![v.toString()] ?? [])
+              .toSet()
+              .toList();
+        } else {
+          // Single select
+          return widget.field.optionsMap![parentValue.toString()] ?? [];
+        }
+      }
+      return [];
+    } else {
+      return widget.field.options ?? [];
+    }
+  }
+
+  String? _validate(List<dynamic>? value) {
+    final required = widget.field.validation != null &&
+        widget.field.validation!['required'] == true;
+    if (required && (value == null || value.isEmpty)) {
+      return 'Required';
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FormField<List<dynamic>>(
+      initialValue: _selected,
+      validator: _validate,
+      onSaved: (val) => FormDataStore.instance.data[widget.field.key] = val,
+      builder: (state) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(widget.field.label),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8.0,
+              children: _options.map((option) {
+                final selected = state.value?.contains(option) ?? false;
+                return FilterChip(
+                  label: Text(option.toString()),
+                  selected: selected,
+                  onSelected: (bool value) {
+                    setState(() {
+                      final updated = List<dynamic>.from(state.value ?? []);
+                      if (value) {
+                        updated.add(option);
+                      } else {
+                        updated.remove(option);
+                      }
+                      state.didChange(updated);
+                      FormDataStore.instance.data[widget.field.key] = updated;
+                      // If this is an independent filter, clear dependent filter(s)
+                      if (widget.field.filterType == 'independent') {
+                        // Find and clear all dependent filters in formData
+                        FormDataStore.instance.data.keys
+                            .where((k) {
+                              // Look for keys of dependent filters (simple heuristic: ends with 'subcategory' or similar)
+                              // In a more robust system, you might pass a callback or context to know dependents
+                              return k != widget.field.key &&
+                                  k != null &&
+                                  k.toString().contains('subcategory');
+                            })
+                            .toList()
+                            .forEach((depKey) {
+                              FormDataStore.instance.data[depKey] = [];
+                            });
+                      }
+                      widget.onChanged?.call();
+                    });
+                  },
+                );
+              }).toList(),
+            ),
+            if (state.hasError)
+              Padding(
+                padding: const EdgeInsets.only(top: 4.0),
+                child: Text(state.errorText!,
+                    style: const TextStyle(color: Colors.red)),
+              ),
+          ],
+        );
+      },
     );
   }
 }

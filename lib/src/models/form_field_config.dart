@@ -20,6 +20,10 @@ class FormFieldConfig {
   final String? minDate;
   final String? maxDate;
   final bool? required;
+  final String? filterType; // 'independent' or 'dependent'
+  final String? dependsOn;
+  final Map<String, List<dynamic>>? optionsMap;
+  final Map<String, dynamic>? validation;
 
   FormFieldConfig({
     required this.type,
@@ -43,6 +47,10 @@ class FormFieldConfig {
     this.minDate,
     this.maxDate,
     this.required,
+    this.filterType,
+    this.dependsOn,
+    this.optionsMap,
+    this.validation,
   });
 
   factory FormFieldConfig.fromJson(Map<String, dynamic> json) {
@@ -68,6 +76,14 @@ class FormFieldConfig {
       minDate: json['minDate'],
       maxDate: json['maxDate'],
       required: json['required'],
+      filterType:
+          json['type'] == 'filter' ? json['filterType'] ?? json['type'] : null,
+      dependsOn: json['dependsOn'],
+      optionsMap: json['optionsMap'] != null
+          ? Map<String, List<dynamic>>.from((json['optionsMap'] as Map)
+              .map((k, v) => MapEntry(k as String, List<dynamic>.from(v))))
+          : null,
+      validation: json['validation'],
     );
   }
 }

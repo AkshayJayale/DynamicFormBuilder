@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dynamic_ui_builder/src/widgets/field_factory.dart';
 import 'models/form_field_config.dart';
+import 'models/form_data_store.dart';
 
 class DynamicUiBuilder extends StatefulWidget {
   final List<Map<String, dynamic>> jsonConfig;
@@ -13,7 +14,6 @@ class DynamicUiBuilder extends StatefulWidget {
 }
 
 class _DynamicUiBuilderState extends State<DynamicUiBuilder> {
-  final Map<String, dynamic> formData = {};
   final List<GlobalKey<FormState>> _formKeys = [];
   late final List<List<FormFieldConfig>> steps;
   late final PageController _pageController;
@@ -45,7 +45,7 @@ class _DynamicUiBuilderState extends State<DynamicUiBuilder> {
         _pageController.nextPage(
             duration: const Duration(milliseconds: 300), curve: Curves.ease);
       } else {
-        widget.onSubmit?.call(formData);
+        widget.onSubmit?.call(FormDataStore.instance.data);
       }
     }
   }
@@ -92,8 +92,19 @@ class _DynamicUiBuilderState extends State<DynamicUiBuilder> {
                         ),
                         const SizedBox(height: 16),
                         for (var field in steps[i])
-                          FieldFactory.build(field, formData, context,
-                              onChanged: () => setState(() {})),
+                          if (!(field.type == 'filter' &&
+                              field.filterType == 'dependent' &&
+                              (field.dependsOn != null &&
+                                  (FormDataStore
+                                              .instance.data[field.dependsOn] ==
+                                          null ||
+                                      FormDataStore
+                                          .instance.data[field.dependsOn]
+                                          .toString()
+                                          .isEmpty))))
+                            FieldFactory.build(
+                                field, context,
+                                onChanged: () => setState(() {})),
                       ],
                     ),
                   ),
