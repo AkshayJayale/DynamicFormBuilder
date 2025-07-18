@@ -3,6 +3,7 @@ import 'package:dynamic_ui_builder/src/widgets/field_factory.dart';
 import 'models/form_field_config.dart';
 import 'models/form_data_store.dart';
 
+/// Widget to build a dynamic multi-step form from a JSON config.
 class DynamicUiBuilder extends StatefulWidget {
   final List<Map<String, dynamic>> jsonConfig;
   final void Function(Map<String, dynamic> result)? onSubmit;
@@ -13,6 +14,7 @@ class DynamicUiBuilder extends StatefulWidget {
   State<DynamicUiBuilder> createState() => _DynamicUiBuilderState();
 }
 
+/// State for DynamicUiBuilder, manages form steps, navigation, and data.
 class _DynamicUiBuilderState extends State<DynamicUiBuilder> {
   final List<GlobalKey<FormState>> _formKeys = [];
   late final List<List<FormFieldConfig>> steps;
@@ -102,8 +104,7 @@ class _DynamicUiBuilderState extends State<DynamicUiBuilder> {
                                           .instance.data[field.dependsOn]
                                           .toString()
                                           .isEmpty))))
-                            FieldFactory.build(
-                                field, context,
+                            FieldFactory.build(field, context,
                                 onChanged: () => setState(() {})),
                       ],
                     ),

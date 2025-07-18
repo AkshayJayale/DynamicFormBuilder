@@ -10,6 +10,7 @@ This example demonstrates how to use the `dynamic_ui_builder` package to build d
    flutter pub get
    flutter run
    ```
+   # Runs the example app on your device or emulator
 
 This will launch the example app showcasing dynamic UI building capabilities, including:
 - Multi-step forms
@@ -19,12 +20,11 @@ This will launch the example app showcasing dynamic UI building capabilities, in
 
 ## Example: Using Filter Fields
 
-Add filter fields to your JSON config as follows:
-
+# Define filter fields in your JSON config
 ```dart
 final formJson = [
   {
-    "type": "filter",
+    "type": "filter", // Main category filter (independent)
     "label": "Category",
     "key": "category",
     "filterType": "independent",
@@ -32,7 +32,7 @@ final formJson = [
     "validation": {"required": true}
   },
   {
-    "type": "filter",
+    "type": "filter", // Subcategory filter (dependent on category)
     "label": "Subcategory",
     "key": "subcategory",
     "filterType": "dependent",
@@ -50,15 +50,14 @@ final formJson = [
 
 ## Accessing Form Data Globally
 
-All form values are stored in a singleton:
-
+# Use the singleton to access or clear all form data
 ```dart
 import 'package:dynamic_ui_builder/src/models/form_data_store.dart';
 
-// Access all form data
+// Access all form data after form submission
 topLevelMap = FormDataStore.instance.data;
 
-// Clear all form data
+// Clear all form data (e.g., after logout or reset)
 FormDataStore.instance.clear();
 ```
 

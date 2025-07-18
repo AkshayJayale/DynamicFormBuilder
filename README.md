@@ -18,7 +18,7 @@ A Flutter package to dynamically generate multi-step forms or single fields from
 Add to your `pubspec.yaml`:
 ```yaml
 dependencies:
-  dynamic_ui_builder: ^1.0.3+9
+  dynamic_ui_builder: ^1.0.3+10
 ```
 Then run:
 ```sh

@@ -1,4 +1,4 @@
-## 1.0.3+9 - 2025-07-18
+## 1.0.3+10 - 2025-07-18
 ### Added
 - FilterChipField: Added support for filter fields with both independent (main category) and dependent (subcategory) logic, using FilterChip UI and optionsMap for dynamic options.
 - FormDataStore: Introduced a singleton class to manage form data globally, replacing local formData maps and enabling persistent, app-wide form state.

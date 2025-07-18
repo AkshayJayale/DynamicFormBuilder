@@ -1,6 +1,6 @@
 name: dynamic_ui_builder
 description: A Flutter package to dynamically build multi-step forms from JSON.
-version: 1.0.3+9
+version: 1.0.3+10
 repository: https://github.com/AkshayJayale/DynamicFormBuilder.git
 
 environment:

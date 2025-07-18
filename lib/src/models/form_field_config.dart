@@ -1,3 +1,4 @@
+/// Model class representing the configuration for a dynamic form field.
 class FormFieldConfig {
   final String type;
   final String label;

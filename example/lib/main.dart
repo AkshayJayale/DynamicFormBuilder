@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:dynamic_ui_builder/src/widgets/field_factory.dart';
 import 'package:dynamic_ui_builder/src/models/form_field_config.dart';
 
+// Main entry point for the example app
 void main() => runApp(const MyApp());
 
+/// Root widget for the example app
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+/// Tab for the dynamic multi-step form
 class DynamicFormTab extends StatelessWidget {
   const DynamicFormTab({super.key});
 
@@ -57,6 +60,7 @@ class DynamicFormTab extends StatelessWidget {
   }
 }
 
+/// Tab for demonstrating single field validation
 class SingleFieldForm extends StatefulWidget {
   const SingleFieldForm({super.key});
 
@@ -64,6 +68,7 @@ class SingleFieldForm extends StatefulWidget {
   State<SingleFieldForm> createState() => _SingleFieldFormState();
 }
 
+/// State for SingleFieldForm, manages validation and submission
 class _SingleFieldFormState extends State<SingleFieldForm> {
   final _formKey = GlobalKey<FormState>();
   String? _fullName;
@@ -118,9 +123,10 @@ class _SingleFieldFormState extends State<SingleFieldForm> {
   }
 }
 
+// Example JSON config for the dynamic form, including filter fields
 final formJson = [
   {
-    "type": "filter",
+    "type": "filter", // Main category filter (independent)
     "label": "Category",
     "key": "category",
     "filterType": "independent",
@@ -166,7 +172,7 @@ final formJson = [
     "required": true
   },
   {
-    "type": "filter",
+    "type": "filter", // Subcategory filter (dependent on category)
     "label": "Subcategory",
     "key": "subcategory",
     "filterType": "dependent",
@@ -177,7 +183,7 @@ final formJson = [
       "Books": ["Fiction", "Non-fiction"]
     },
     "validation": {"required": true},
-    "step": 1,
+    "step": 0,
     "title": "Filters"
   },
   {

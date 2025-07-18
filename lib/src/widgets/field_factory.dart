@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart'; // Ensure this is available
 import 'package:http/http.dart' as http;
 import '../models/form_data_store.dart';
 
+/// Factory class to build form fields dynamically based on FormFieldConfig.
 class FieldFactory {
   static Widget build(
     FormFieldConfig field,
@@ -19,7 +20,8 @@ class FieldFactory {
     switch (field.type) {
       case 'text':
         return TextFormField(
-          controller: TextEditingController(text: FormDataStore.instance.data[field.key]),
+          controller: TextEditingController(
+              text: FormDataStore.instance.data[field.key]),
           decoration:
               InputDecoration(labelText: field.label, hintText: field.hint),
           keyboardType: _getKeyboardType(field.inputType),
@@ -303,6 +305,7 @@ class FieldFactory {
   }
 }
 
+/// Signature capture field widget for drawing and saving signatures.
 class _SignatureField extends StatefulWidget {
   final String label;
   final String fieldKey;
@@ -319,6 +322,7 @@ class _SignatureField extends StatefulWidget {
   State<_SignatureField> createState() => _SignatureFieldState();
 }
 
+/// State for _SignatureField, manages signature drawing and saving.
 class _SignatureFieldState extends State<_SignatureField> {
   late SignatureController _controller = SignatureController(
     penStrokeWidth: 10,
@@ -412,6 +416,7 @@ class _SignatureFieldState extends State<_SignatureField> {
   }
 }
 
+/// Image picker field widget for selecting images from the gallery.
 class _ImagePickerField extends StatefulWidget {
   final String label;
   final String fieldKey;
@@ -428,6 +433,7 @@ class _ImagePickerField extends StatefulWidget {
   State<_ImagePickerField> createState() => _ImagePickerFieldState();
 }
 
+/// State for _ImagePickerField, manages image selection and display.
 class _ImagePickerFieldState extends State<_ImagePickerField> {
   final ImagePicker _picker = ImagePicker();
 
@@ -459,6 +465,7 @@ class _ImagePickerFieldState extends State<_ImagePickerField> {
   }
 }
 
+/// File picker field widget for selecting files from the device.
 class _FilePickerField extends StatefulWidget {
   final String label;
   final String fieldKey;
@@ -475,6 +482,7 @@ class _FilePickerField extends StatefulWidget {
   State<_FilePickerField> createState() => _FilePickerFieldState();
 }
 
+/// State for _FilePickerField, manages file selection and display.
 class _FilePickerFieldState extends State<_FilePickerField> {
   String? _fileName;
 
@@ -516,6 +524,7 @@ class _FilePickerFieldState extends State<_FilePickerField> {
   }
 }
 
+/// PDF view field widget for displaying PDF files from various sources.
 class _PDFViewField extends StatefulWidget {
   final String label;
   final String fieldKey;
@@ -532,6 +541,7 @@ class _PDFViewField extends StatefulWidget {
   State<_PDFViewField> createState() => _PDFViewFieldState();
 }
 
+/// State for _PDFViewField, manages PDF loading and display.
 class _PDFViewFieldState extends State<_PDFViewField> {
   String? _fileName;
   var filePath;
@@ -677,6 +687,7 @@ class _PDFViewFieldState extends State<_PDFViewField> {
   }
 }
 
+/// Filter chip field widget for rendering independent and dependent filter fields using FilterChip UI.
 class _FilterChipField extends StatefulWidget {
   final FormFieldConfig field;
   final VoidCallback? onChanged;
@@ -691,6 +702,7 @@ class _FilterChipField extends StatefulWidget {
   State<_FilterChipField> createState() => _FilterChipFieldState();
 }
 
+/// State for _FilterChipField, manages filter selection and dynamic options.
 class _FilterChipFieldState extends State<_FilterChipField> {
   List<dynamic> get _selected =>
       (FormDataStore.instance.data[widget.field.key] as List<dynamic>?) ?? [];
