@@ -1,8 +1,11 @@
-## [NEXT RELEASE] - YYYY-MM-DD
+## 1.0.3+9 - 2025-07-18
+### Added
+- FilterChipField: Added support for filter fields with both independent (main category) and dependent (subcategory) logic, using FilterChip UI and optionsMap for dynamic options.
+- FormDataStore: Introduced a singleton class to manage form data globally, replacing local formData maps and enabling persistent, app-wide form state.
 
 ---
 
-## 1.0.2+6 - 2025-01-27
+## 1.0.2+6 - 2025-07-14
 ### Fixed
 - Added missing `http` dependency to `pubspec.yaml` to resolve import error.
 - Removed unused `_imageFile` field from `_ImagePickerFieldState` class.
